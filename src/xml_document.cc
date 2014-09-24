@@ -84,6 +84,22 @@ NAN_METHOD(XmlDocument::Root)
     NanReturnValue(args[0]);
 }
 
+NAN_METHOD(XmlDocument::GetDtd)
+{
+    NanScope();
+    XmlDocument* document = ObjectWrap::Unwrap<XmlDocument>(args.Holder());
+    assert(document);
+
+    xmlDtdPtr dtd = xmlGetIntSubset(document->xml_obj);
+
+    if (!dtd) {
+        NanReturnNull();
+    }
+        NanReturnValue(NanNew<v8::String>(
+                    (const char *)dtd->SystemID, strlen((const char *)dtd->SystemID)));
+
+}
+
 NAN_METHOD(XmlDocument::SetDtd)
 {
     NanScope();
@@ -400,6 +416,9 @@ XmlDocument::Initialize(v8::Handle<v8::Object> target)
     NODE_SET_PROTOTYPE_METHOD(tmpl,
             "_setDtd",
             XmlDocument::SetDtd);
+    NODE_SET_PROTOTYPE_METHOD(tmpl,
+            "_getDtd",
+            XmlDocument::GetDtd);
 
 
     NODE_SET_METHOD(target, "fromXml", XmlDocument::FromXml);
